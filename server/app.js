@@ -1,32 +1,39 @@
-// Import required modules
 const express = require('express');
+const axios = require('axios');
 
-// Create an Express application
 const app = express();
+const PORT = 3000;
 
-// Define a route for the homepage
-app.get('/', (req, res) => {
-  res.send('Welcome to the homepage!');
+// Route to send a request to the ChatGPT API
+app.get('/chat', async (req, res) => {
+  try {
+    // Get the prompt from the query parameters
+    const prompt = req.query.prompt;
+
+    // Make a POST request to the ChatGPT API
+    const response = await axios.post('https://api.openai.com/v1/completions', {
+      prompt: prompt,
+      max_tokens: 50, // Adjust max_tokens as needed
+      temperature: 0.7, // Adjust temperature as needed
+      model: 'text-davinci-003', // Adjust the model as needed
+      engine: 'davinci',
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_OPENAI_API_KEY', // Replace with your OpenAI API key
+      }
+    });
+
+    // Send the response from the ChatGPT API back to the client
+    res.json(response.data);
+  } catch (error) {
+    // Log the actual error message for debugging
+    console.error('Error occurred:', error.response.data);
+    res.status(500).json({ error: 'An error occurred while processing your request' });
+  }
 });
 
-// Define a route for the about page
-app.get('/about', (req, res) => {
-  res.send('About Us');
-});
-
-// Define a route with dynamic parameters
-app.get('/user/:userId', (req, res) => {
-  const userId = req.params.userId;
-  res.send(`User ID: ${userId}`);
-});
-
-// Define a route for handling POST requests
-app.post('/submit', (req, res) => {
-  res.send('Form submitted successfully!');
-});
-
-// Start the server and listen on the specified port
-const PORT = 3001;
+// Starting the server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
