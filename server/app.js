@@ -1,39 +1,57 @@
-const express = require('express');
-const axios = require('axios');
+
+import express from "express";
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+
+
+
+import OpenAI from "openai";
+import mongoose from "mongoose";
+const openai = new OpenAI();
+
+import User from "./models/user.js";
+
+
+
+
+
 
 const app = express();
-const PORT = 3000;
 
-// Route to send a request to the ChatGPT API
-app.get('/chat', async (req, res) => {
-  try {
-    // Get the prompt from the query parameters
-    const prompt = req.query.prompt;
 
-    // Make a POST request to the ChatGPT API
-    const response = await axios.post('https://api.openai.com/v1/completions', {
-      prompt: prompt,
-      max_tokens: 50, // Adjust max_tokens as needed
-      temperature: 0.7, // Adjust temperature as needed
-      model: 'text-davinci-003', // Adjust the model as needed
-      engine: 'davinci',
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_OPENAI_API_KEY', // Replace with your OpenAI API key
-      }
-    });
-
-    // Send the response from the ChatGPT API back to the client
-    res.json(response.data);
-  } catch (error) {
-    // Log the actual error message for debugging
-    console.error('Error occurred:', error.response.data);
-    res.status(500).json({ error: 'An error occurred while processing your request' });
-  }
-});
-
-// Starting the server
-app.listen(PORT, () => {
+mongoose.connect(process.env.DB).then((res) => app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+})).catch((err) => console.log(err))
+
+const PORT = 3001;
+
+
+
+
+// Route to respond with a message
+app.get('/hello', async (req, res) => {
+  const completion = await openai.chat.completions.create({
+    messages: [
+      { "role": "assistant", "content": "you are a code assistant" },
+      { "role": "user", "content": "who are you ?" },
+    ],
+    model: "gpt-3.5-turbo",
+  });
+
+  res.send(completion.choices[0])
 });
+
+
+app.get('/addUser', (req, res) => {
+  const user = new User({
+    email: 'mohamedtigha999@gmail.com',
+    token: 'adalfhzjkbgejhbvgebgeurbvgeyrvgbuyerbgvueryvgubyerguyveryvgbeuirbvgeur',
+  });
+
+  user.save().then((result) => { res.send(result) }).catch((err) => { console.log(err) })
+
+})
+
+
