@@ -1,14 +1,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Cookies } from "js-cookie"
+import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 
 
 
-function Home() {
+
+function Welcome() {
 
     const [user, setUser] = useState({})
+    const navigate = useNavigate()
 
     function handleCallbackResponse(res) {
         const userObject = jwtDecode(res.credential)
@@ -16,6 +19,7 @@ function Home() {
         setUser(userObject)
         Cookies.set('token', res.credential)
         document.getElementById("signInDiv").hidden = true
+        navigate('/main')
     }
 
     function signOut() {
@@ -41,7 +45,9 @@ function Home() {
 
     function getCookie() {
         const token = Cookies.get('token')
-        console.log(token)
+        // console.log(token)
+        const userObject = jwtDecode(token)
+        console.log(userObject)
     }
 
 
@@ -61,4 +67,4 @@ function Home() {
     )
 }
 
-export default Home;
+export default Welcome;

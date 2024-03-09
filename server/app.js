@@ -12,13 +12,15 @@ import mongoose from "mongoose";
 const openai = new OpenAI();
 
 import User from "./models/user.js";
-
+import History from "./models/history.js";
 
 
 
 
 
 const app = express();
+
+const ObjectId = mongoose.Types.ObjectId;
 
 
 mongoose.connect(process.env.DB).then((res) => app.listen(PORT, () => {
@@ -52,6 +54,16 @@ app.get('/addUser', (req, res) => {
 
   user.save().then((result) => { res.send(result) }).catch((err) => { console.log(err) })
 
+})
+
+app.get('/addHistory', (req, res) => {
+  const user = new ObjectId('0000')
+  const history = new History({
+    user: new ObjectId('001'),
+    pseudoCode: 'azdazdad',
+    generatedCode: 'azdazdafafaz',
+  });
+  history.save().then((result) => { res.send(result) }).catch((err) => { console.log(err) })
 })
 
 
