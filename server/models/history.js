@@ -3,8 +3,12 @@ const Schema = mongoose.Schema;
 
 const historySchema = new Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref:'User',
+        required: true
+    },
+    lang: {
+        type: String,
         required: true
     },
     pseudoCode: {
