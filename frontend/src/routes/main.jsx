@@ -12,8 +12,13 @@ function Main() {
     const [user, setUser] = useState(null)
     const navigate = useNavigate()
     const [history, setHistory] = useState([])
+    const [isOpen, setIsOpen] = useState(false)
 
     const [isDropDownOpen, setIsDropDownOpen] = useState(false)
+
+    function toggleTab() {
+        setIsOpen(!isOpen)
+    }
 
     useEffect(() => {
         const token = Cookies.get('token')
@@ -113,9 +118,21 @@ function Main() {
         // MAIN DIV
         <div className=" min-h-screen grid grid-cols-6">
             {/* HISTORY DIV */}
-            {<div className="relative bg-[#171717]  col-span-1">
+            {!isOpen && <div className="absolute left-2 top-2">
+                <button onClick={toggleTab}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                    </svg>
+                </button>
+            </div>}
+            <div className={`${isOpen ? "absolute" : "hidden"} h-full w-[50%] lg:block lg:relative bg-[#171717] lg:w-full lg:col-span-1`}>
+                {<button onClick={toggleTab} className={` absolute lg:hidden right-0  bottom-0 top-0 `}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+                    </svg>
+                </button>}
                 {/* HISTORIQUE TITLE */}
-                <div className="text-lg h-[7%] text-[32px] font-bold text-white flex justify-start px-4 items-center text-bold ">
+                <div className="lg:flex text-lg h-[7%] text-[30px] font-bold text-white flex justify-start px-4 items-center text-bold ">
                     Historique
                 </div>
                 {/* SEARCH BOX */}
@@ -140,13 +157,20 @@ function Main() {
                     ))}
                 </div>
                 {user && <div className="absolute left-0 right-0 bottom-0 mb-4 mx-2">
-                    <div  onClick={toggleDropDown} className="cursor-pointer h-[7%] text-white grid grid-cols-10 rounded-lg mx-1 p-2 justify-center items-center hover:bg-[#2F2F2F]">
-                        {<div className="rounded-full col-span-2 h-12 w-12 bg-red-900">
+                    <div onClick={toggleDropDown} className="cursor-pointer h-[7%] text-white grid grid-cols-10 rounded-lg mx-1 p-2 justify-center items-center hover:bg-[#2F2F2F]">
+                        {<div className="rounded-full col-span-3 h-12 w-12 bg-red-900">
                             <img src={user.picture} alt="" className="rounded-full h-12 w-12" />
                         </div>}
-                        <div className="col-span-8">
+                        <div className="hidden 2xl:block col-span-7">
                             <div className="font-bold">{user.name}</div>
-                            <div className="text-sm text-grey-500">{user.email}</div>
+                            <div className="text-[11px] text-grey-500">{user.email}</div>
+                        </div>
+                        <div className="hidden xl:block 2xl:hidden col-span-7">
+                            <div className="font-bold">
+                                {user.name.split(' ').length > 1 &&
+                                    `${user.name.split(' ')[1].charAt(0)}. ${user.name.split(' ')[0]}`}
+                            </div>
+                            {/* <div className="text-sm text-grey-500">{user.email}</div> */}
                         </div>
                     </div>
                     {/* Dropdown content */}
@@ -163,23 +187,25 @@ function Main() {
                         </div>
                     )}
                 </div>}
-
-            </div>}
+            </div>
             {/* BIG DIV */}
-            <div className="bg-[#212121] col-span-5 text-white space-y-2 p-4">
-                <div className="h-[40%]">
-                    <div className="h-[7%]">
+            <div onClick={()=>setIsOpen(false)} className="bg-[#212121] col-span-6 lg:col-span-5 text-white space-y- p-4 grid grid-rows-10">
+                <div className=" flex justify-center items-center font-bold text-2xl p-4 row-span-1">
+                    Générateur de Code assistant
+                </div>
+                <div className=" row-span-4 grid grid-rows-10">
+                    <div className="row-span-1">
                         De:
                     </div>
                     <textarea
                         value={code}
                         onChange={handleCodeChange}
-                        className="w-full h-[93%] border rounded-md p-2 resize-none p-2 text-white bg-[#2F2F2F] border-[#424242] focus:outline-none placeholder-[#899090]"
+                        className="my-3 w-full row-span-9 border rounded-md p-2 resize-none p-2 text-white bg-[#2F2F2F] border-[#424242] focus:outline-none placeholder-[#899090]"
                         placeholder="Enter your text here..."
                     ></textarea>
                 </div>
-                <div className="h-[8%] flex items-center space-x-4 px-4">
-                    <div>
+                <div className=" flex items-center space-x-4 px-4 row-span-1">
+                    <div className="">
                         Choisir langage code généré:
                     </div>
                     <div>
@@ -197,14 +223,14 @@ function Main() {
                         <button onClick={getCode} className="bg-gray-200 h-15 text-black rounded-md p-2 m-1 font-bold">Coder</button>
                     </div>
                 </div>
-                {data && <div className="h-[50%]">
-                    <div className="h-[7%]">
+                {data && <div className=" row-span-4 grid grid-rows-10">
+                    <div className="row-span-1">
                         Réponse:
                     </div>
                     <textarea
                         readOnly
                         value={data}
-                        className="w-full h-[93%] border rounded-md p-2 resize-none p-2 text-white bg-[#2F2F2F] border-[#424242] focus:outline-none placeholder-[#899090]"
+                        className="my-3 w-full  row-span-9 border rounded-md p-2 resize-none p-2 text-white bg-[#2F2F2F] border-[#424242] focus:outline-none placeholder-[#899090]"
                     ></textarea>
                 </div>}
             </div>
